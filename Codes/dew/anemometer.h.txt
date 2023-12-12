@@ -1,0 +1,20 @@
+/*
+ * anemometer.h
+ *
+ * Created: 8/10/2023 10:20:15 PM
+ *  Author: Dewmith
+ */ 
+
+
+#ifndef ANEMOMETER_H_
+#define ANEMOMETER_H_
+
+ void anemometer_ISR();
+
+ void anemometer_init();
+ 
+float getaveragewind();
+
+
+
+#endif /* ANEMOMETER_H_ */

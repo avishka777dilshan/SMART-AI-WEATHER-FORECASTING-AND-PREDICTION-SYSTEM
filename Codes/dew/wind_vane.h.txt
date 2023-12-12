@@ -1,0 +1,25 @@
+/*
+ * wind_vane.h
+ *
+ * Created: 8/10/2023 10:20:37 PM
+ *  Author: Dewmith
+ */ 
+
+
+#ifndef WIND_VANE_H_
+#define WIND_VANE_H_
+
+enum
+{
+	NORTH = 1,
+	WEST,
+	EAST,
+	SOUTH
+};
+void wind_vane_init();
+
+
+uint8_t getWindDirection(void);
+
+
+#endif /* WIND_VANE_H_ */

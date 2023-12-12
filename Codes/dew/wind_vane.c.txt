@@ -1,0 +1,52 @@
+/*
+ * wind_vane.c
+ *
+ * Created: 8/10/2023 10:20:57 PM
+ *  Author: Dewmith
+ */ 
+
+#include "GPIO.h"
+#include "wind_vane.h"
+#include "debug_utilis.h"
+#include "ADC.h"
+
+uint16_t vane_reading = 0;
+
+void wind_vane_init()
+{
+	GPIO_SET_PIN(RAIN_GUAGE_IN_Pin, RAIN_GUAGE_IN_Port, INPUT);
+}
+
+/**
+  @brief calculate wind direction
+  @return wind direction at data poll moment
+*/
+uint8_t getWindDirection(void)
+{
+	for (uint8_t dumb = 0; dumb < 30; dumb++) 
+	{
+		ADC_READ(WIND_VANE_IN_Channel);
+	}
+	vane_reading = ADC_READ(WIND_VANE_IN_Channel); 
+
+	if((1023 >= vane_reading) && (vane_reading > 956))
+	{
+		return WEST;
+	}
+	else if((112 <= vane_reading) && (vane_reading < 347))
+	{
+		return EAST;
+	}
+	else if(( 1023 > vane_reading) && (vane_reading >= 347))
+	{
+		return SOUTH;
+	}  
+	else if((956 >= vane_reading) && (vane_reading > 112))
+	{
+		return NORTH;
+	}
+	else
+	{
+		return 0;
+	}
+}

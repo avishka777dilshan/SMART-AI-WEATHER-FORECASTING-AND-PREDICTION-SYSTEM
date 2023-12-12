@@ -1,0 +1,89 @@
+/*
+ * anemometer.c
+ *
+ * created: 8/10/2023 10:21:21 pm
+ *  author: dewmith
+ */ 
+#include "gpio.h"
+#include "ADC.h"
+#include "debug_utilis.h"
+#include "UART.h"
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#include "Timer.h"
+
+#define NUM_OF_SAMPLES 50
+#define WIND_FACTOR 2400
+
+uint8_t count = 0;
+uint8_t	sample_counter = 0;
+uint32_t duration = 0;
+bool pulse_started = false;
+uint32_t wind_time = 0;
+
+void anemometer_init()
+{
+	GPIO_SET_PIN(ANEMOMETER_IN_Pin, ANEMOMETER_IN_Port, INPUT);
+	GPIO_EXTINT_SET(ANEMOMETER_IN_INT, RISING);	
+}
+
+/**
+  @brief isr of anemometer 
+*/
+
+void anemometer_ISR(void)
+{
+
+  _delay_ms(50);
+  if(1 == GPIO_READ_PIN(ANEMOMETER_IN_Pin, ANEMOMETER_IN_Port))
+  {   
+	   count++;
+	   sample_counter++;
+	   if(1 == count )
+	   {
+			duration = millis();
+	   }
+	   else if(2 == count )
+	   {		   
+            wind_time = millis() - duration;
+			count = 0;	
+			duration = 0;
+	   }
+	   else
+	   {
+		   //no implementation
+	   }
+	   
+	   if(NUM_OF_SAMPLES == sample_counter)
+	   {		   
+		   sample_counter = 0;
+	   }
+  }
+}
+
+/**
+  @brief calculate average wind during data poll interval
+  @param data update interval to average
+  @return average wind from last poll
+*/
+
+
+float getaveragewind()
+{
+
+	float tmp = WIND_FACTOR / (wind_time/sample_counter);
+	if(tmp > 50.0)
+	{
+		tmp = 0.0;
+	}
+	wind_time = 0;
+	count = 0;
+	sample_counter = 0;
+	return tmp; 
+}
+
+
+ISR(INT0_vect)
+{
+	anemometer_ISR();
+}
